@@ -27,4 +27,39 @@ public class VagaController {
 		return "vaga/formVaga";
 	}
 	
+	@RequestMapping(value = "/cadastrarVaga", method = RequestMethod.POST)
+	public String form(@Valid Vaga vaga, BindingResult result, RedirectAttributes attributes) {
+		
+		if(result.hasErrors()) {
+			attributes.addFlashAttribute("mensagem", "Verifique os campos...");
+			return "redirect:/cadastrarVaga";
+		}
+		
+		vr.save(vaga);
+		attributes.addFlashAttribute("mensagem", "Vaga Cadastrada Com Sucesso!");
+		return "Redirect:/cadastrarVaga";
+	}
+	
+	@RequestMapping("/vagas")
+	public ModelAndView listaVagas() {
+		ModelAndView mv = new ModelAndView("vaga/listaVaga");
+		Iterable<Vaga> vagas = vr.findAll();
+		mv.addObject("vagas", vagas);
+		return mv;
+	}
+	
+	@RequestMapping(value = "/{codigo}", method = RequestMethod.GET)
+	public ModelAndView detalhesDaVaga(@PathVariable("codigo") long codigo) {
+		Vaga vaga = vr.findByCodigo(codigo);
+		ModelAndView mv = new ModelAndView("vaga/detalhesVaga");
+		mv.addObject("vaga", vaga);
+		
+		Iterable<Canditado> canditados = cr.findByVaga(vaga);
+		mv.addObject("Candidatos", canditados);
+		
+		return mv;
+		
+	}
+	
+	
 }
